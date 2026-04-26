@@ -1,5 +1,17 @@
 # create-tanstack
 
+## 0.54.23
+
+### Patch Changes
+
+- Auto-generated changeset from semantic commits on main.
+
+  - chore: update to TS6.0, fix deprecated tsconfig options (#421) (847b396)
+
+- Updated dependencies []:
+  - @tanstack/cli@0.64.2
+  - @tanstack/create@0.63.6
+
 ## 0.54.22
 
 ### Patch Changes
