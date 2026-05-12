@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true # review job pushes a generated branch
 
       - name: Setup Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -121,28 +121,22 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
           git commit --allow-empty -m "chore: review stale skills for ${VERSION}"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BRANCH"
+          git push origin "$BRANCH"
+
+          {
+            printf '%s\n\n' '## Stale Skills Detected'
+            printf '%s\n\n' 'The following skills may need updates after the latest release:'
+            printf '%s\n\n' "$SUMMARY"
+            printf '%s\n\n' '---'
+            printf '%s\n\n' '### Update Prompt'
+            printf '%s\n\n' 'Paste this into your coding agent (Claude Code, Cursor, etc.):'
+            printf '%s\n' '~~~'
+            printf '%s\n' "$PROMPT"
+            printf '%s\n' '~~~'
+          } > pr-body.md
 
           gh pr create \
             --title "Review stale skills (${VERSION})" \
-            --body "$(cat <<'PREOF'
-          ## Stale Skills Detected
-
-          The following skills may need updates after the latest release:
-
-          ${SUMMARY}
-
-          ---
-
-          ### Update Prompt
-
-          Paste this into your coding agent (Claude Code, Cursor, etc.):
-
-          ~~~
-          ${PROMPT}
-          ~~~
-
-          PREOF
-          )" \
+            --body-file pr-body.md \
             --head "$BRANCH" \
             --base main
